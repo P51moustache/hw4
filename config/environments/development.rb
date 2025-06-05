@@ -54,6 +54,9 @@ Rails.application.configure do
     generator.test_framework nil
   end
   
+  # Store uploaded files on the local file system (see config/storage.yml for options).
+  config.active_storage.service = :local
+  
   config.hosts = nil
 
   # Raises error for missing translations.

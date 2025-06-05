@@ -1,0 +1,26 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1><%= @entry.title %></h1>
+  <div class="d-flex">
+    <%= link_to "Edit", "/entries/#{@entry.id}/edit", class: "btn btn-primary" %>
+    <%= button_to "Delete", "/entries/#{@entry.id}", method: :delete,
+        class: "btn btn-danger ms-2",
+        data: { confirm: "Are you sure you want to delete this entry?" },
+        form: { style: "display: inline;" } %>
+  </div>
+</div>
+
+<div class="mb-3">
+  <%= link_to "← Back to #{@entry.place.name}", "/places/#{@entry.place_id}", class: "btn btn-outline-secondary" %>
+</div>
+
+<div class="card">
+  <% if @entry.image.attached? %>
+    <%= image_tag @entry.image, class: "card-img-top", style: "height: 400px; object-fit: cover;" %>
+  <% end %>
+  <div class="card-body">
+    <h6 class="card-subtitle mb-3 text-muted">
+      <%= @entry.occurred_on.strftime("%B %d, %Y") %>
+    </h6>
+    <p class="card-text"><%= simple_format(@entry.description) %></p>
+  </div>
+</div>

@@ -1,22 +1,38 @@
 class PlacesController < ApplicationController
+  before_action :require_login
 
   def index
-    @places = Place.all
+    @places = @current_user.places.includes(:entries)
   end
 
   def show
-    @place = Place.find_by({ "id" => params["id"] })
-    @entries = Entry.where({ "place_id" => @place["id"] })
+    @place = @current_user.places.find(params[:id])
+    # Only show entries created by the current user
+    @entries = @place.entries.where(user_id: @current_user.id)
   end
 
   def new
+    @place = @current_user.places.new
   end
 
   def create
-    @place = Place.new
-    @place["name"] = params["name"]
-    @place.save
+    @place = @current_user.places.new(place_params)
+    if @place.save
+      redirect_to "/places"
+    else
+      render :new
+    end
+  end
+
+  def destroy
+    @place = @current_user.places.find(params[:id])
+    @place.destroy
     redirect_to "/places"
   end
 
+  private
+
+  def place_params
+    params.require(:place).permit(:name)
+  end
 end

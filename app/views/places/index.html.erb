@@ -1,11 +1,59 @@
-<h1>Places</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>My Places</h1>
+  <%= link_to "Add New Place", "/places/new", class: "btn btn-primary" %>
+</div>
 
-<ul>
-  <% for place in @places %>
-    <li><a href="/places/<%= place["id"] %>"><%= place["name"] %></a></li>
-  <% end %>
-</ul>
-
-<p>
-  <a href="/places/new">New place</a>
-</p>
+<% if @places.any? %>
+  <div class="row">
+    <% @places.each do |place| %>
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title"><%= place.name %></h5>
+            
+            <% recent_entries = place.entries.where(user_id: @current_user.id).order(created_at: :desc).limit(2) %>
+            <% if recent_entries.any? %>
+              <div class="mb-3 flex-grow-1">
+                <h6 class="text-muted mb-2">Recent Entries:</h6>
+                <% recent_entries.each do |entry| %>
+                  <div class="mb-2">
+                    <small class="fw-bold d-block"><%= entry.title %></small>
+                    <small class="text-muted">
+                      <%= truncate(entry.description, length: 80) %>
+                    </small>
+                    <br>
+                    <small class="text-secondary">
+                      <%= entry.occurred_on.strftime("%b %d, %Y") %>
+                    </small>
+                  </div>
+                <% end %>
+                <% if place.entries.where(user_id: @current_user.id).count > 2 %>
+                  <small class="text-muted">
+                    + <%= place.entries.where(user_id: @current_user.id).count - 2 %> more entries
+                  </small>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="mb-3 flex-grow-1">
+                <small class="text-muted">No entries yet for this place.</small>
+              </div>
+            <% end %>
+            
+            <div class="mt-auto d-flex justify-content-between">
+              <%= link_to "View Details", "/places/#{place.id}", class: "btn btn-outline-primary" %>
+              <%= button_to "Delete", "/places/#{place.id}", method: :delete,
+                  class: "btn btn-outline-danger",
+                  form: { style: "display: inline;" } %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    <h4>No places yet!</h4>
+    <p>Start by adding your first travel destination.</p>
+    <%= link_to "Add Your First Place", "/places/new", class: "btn btn-primary" %>
+  </div>
+<% end %>
